@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('englishQuizTheme') === 'dark' ? 'dark' : 'light'; }
+    catch (_) { document.documentElement.dataset.theme = 'light'; }
+  </script>
+  <title>중1 영어 문법 500문제 · 주관식 자동 채점</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, "Malgun Gothic", sans-serif;
+      color: #17253d;
+      background: #f3f6fc;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { width: min(760px, calc(100% - 32px)); margin: 40px auto; }
+    h1 { margin: 0 0 8px; font-size: clamp(25px, 5vw, 36px); }
+    .subtitle { margin: 0 0 26px; color: #65738b; }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f2;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 35px #1c35520b;
+      margin-bottom: 18px;
+    }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    select, button { font: inherit; border-radius: 11px; }
+    select {
+      flex: 1 1 220px;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: #17253d;
+    }
+    button { cursor: pointer; }
+    .primary, .secondary, .danger {
+      padding: 12px 16px;
+      border: 0;
+      font-weight: 700;
+    }
+    .primary { color: white; background: #365ee8; }
+    .primary:hover { background: #244bd4; }
+    .secondary { color: #2848a5; background: #e9efff; }
+    .secondary:hover { background: #dce6ff; }
+    .danger { color: #a42639; background: #fff0f2; }
+    .danger:hover { background: #ffe3e8; }
+    button:focus-visible, select:focus-visible {
+      outline: 3px solid #f7ac42;
+      outline-offset: 2px;
+    }
+    button:disabled { opacity: .48; cursor: not-allowed; }
+    .stats { display: flex; gap: 14px; flex-wrap: wrap; margin: 17px 0 0; color: #52627e; }
+    .stats strong { color: #17253d; }
+    .progress {
+      height: 10px;
+      background: #e9eef7;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 18px 0 0;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0;
+      background: #4773f3;
+      transition: width .2s;
+    }
+    .eyebrow { color: #4964a4; font-weight: 700; font-size: 14px; }
+    .question {
+      font-size: clamp(21px, 4vw, 27px);
+      line-height: 1.55;
+      margin: 20px 0 23px;
+      overflow-wrap: anywhere;
+    }
+    .answer-form { display: flex; flex-wrap: wrap; gap: 10px; }
+    .answer-input {
+      flex: 1 1 220px;
+      min-width: 0;
+      padding: 14px 15px;
+      border: 2px solid #cbd5e1;
+      border-radius: 11px;
+      font: inherit;
+      color: #17253d;
+    }
+    .answer-input:focus { outline: 3px solid #a9beff; outline-offset: 2px; }
+    .answer-input:disabled { background: #f4f6fb; }
+    .score { font-weight: 800; color: #264bc7; }
+    .result-box { background: #f0f4ff; border-radius: 14px; padding: 18px; }
+    .review-list { max-height: 320px; overflow: auto; line-height: 1.6; }
+    .review-list li { margin-bottom: 13px; }
+    .references { color: #65738b; font-size: 13px; line-height: 1.7; margin: 10px 0 35px; }
+    .references a { color: #2848a5; }
+    .feedback {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      line-height: 1.6;
+      background: #f2f5fc;
+    }
+    .feedback.good { background: #e9f9f0; }
+    .feedback.bad { background: #fff0f1; }
+    .next-row { display: flex; justify-content: flex-end; margin-top: 18px; }
+    .muted { color: #65738b; }
+    .hint { font-size: 13px; color: #78859a; margin: 15px 0 0; }
+    .browser-head { margin: 0 0 6px; }
+    .browser-help { margin: 0 0 16px; color: #65738b; font-size: 14px; line-height: 1.6; }
+    .browser-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+    .browser-controls input[type="search"] { flex: 2 1 240px; min-width: 0; padding: 12px; font: inherit; border: 1px solid #cbd5e1; border-radius: 11px; }
+    .browser-controls select { flex: 1 1 150px; }
+    .browser-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 15px 0; }
+    .browser-actions button { padding: 9px 12px; }
+    .browser-count { width: 100%; color: #52627e; font-size: 14px; }
+    .question-list { max-height: 450px; overflow-y: auto; border: 1px solid #e2e8f2; border-radius: 12px; }
+    .question-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; border-bottom: 1px solid #edf1f7; cursor: pointer; line-height: 1.5; }
+    .question-item:last-child { border-bottom: 0; }
+    .question-item:hover { background: #f5f8ff; }
+    .question-item input { margin-top: 5px; flex: 0 0 auto; width: 17px; height: 17px; accent-color: #365ee8; }
+    .item-info { min-width: 0; overflow-wrap: anywhere; }
+    .item-meta { display: block; color: #52627e; font-size: 13px; margin-bottom: 2px; }
+    .level-easy { color: #20764c; } .level-medium { color: #9a5700; } .level-hard { color: #9a2a58; }
+    .empty-list { padding: 18px; color: #65738b; margin: 0; }
+    .browser-controls input:focus-visible, .question-item input:focus-visible { outline: 3px solid #f7ac42; outline-offset: 2px; }
+    /* 모바일 대응 및 화이트/블랙 테마 */
+    :root { color-scheme: light; }
+    body { min-height: 100vh; background: radial-gradient(circle at 85% -10%, #e3eaff, transparent 38%), #f3f6fc; }
+    main { width: min(920px, calc(100% - 32px)); margin: 32px auto 60px; }
+    .heading-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 9px; }
+    .heading-row h1 { margin: 0; letter-spacing: -.04em; }
+    .theme-toggle { flex: 0 0 auto; min-width: 104px; padding: 10px 13px; border: 1px solid #d5dff0; border-radius: 999px; background: #fff; color: #253b65; font-weight: 700; }
+    .theme-toggle:hover { background: #e9efff; }
+    .card { border-radius: 22px; box-shadow: 0 14px 40px #1c35520d; }
+    .primary { background: #3455dc; box-shadow: 0 4px 12px #3455dc25; }
+    .question { font-weight: 700; }
+    .translation { margin: -12px 0 20px; padding: 12px 15px; border-left: 4px solid #7292ed; border-radius: 0 10px 10px 0; background: #f2f5ff; color: #334465; line-height: 1.7; white-space: pre-wrap; }
+    .translation strong { display: block; font-size: 13px; margin-bottom: 3px; color: #3657a6; }
+    .explain-title { display: block; margin: 0 0 6px; }
+    .explain-paragraph { margin: 8px 0 0; }
+    .explain-example { margin-top: 10px; padding: 9px 12px; border-radius: 8px; background: #ffffffb8; overflow-wrap: anywhere; }
+    :root[data-theme="dark"] { color-scheme: dark; background: #0c1220; color: #ebf1ff; }
+    :root[data-theme="dark"] body { background: radial-gradient(circle at 85% -10%, #1d2f60, transparent 38%), #0c1220; }
+    :root[data-theme="dark"] .card { background: #182235; color: #ebf1ff; border-color: #35435a; box-shadow: 0 14px 42px #0003; }
+    :root[data-theme="dark"] .subtitle, :root[data-theme="dark"] .browser-help, :root[data-theme="dark"] .browser-count, :root[data-theme="dark"] .stats, :root[data-theme="dark"] .item-meta, :root[data-theme="dark"] .muted, :root[data-theme="dark"] .hint, :root[data-theme="dark"] .references, :root[data-theme="dark"] .empty-list { color: #afbdd4; }
+    :root[data-theme="dark"] .stats strong { color: #f2f6ff; }
+    :root[data-theme="dark"] .score, :root[data-theme="dark"] .eyebrow, :root[data-theme="dark"] .references a { color: #a9c1ff; }
+    :root[data-theme="dark"] .theme-toggle, :root[data-theme="dark"] select, :root[data-theme="dark"] .answer-input, :root[data-theme="dark"] .browser-controls input { background: #10192b; color: #ebf1ff; border-color: #4b5c7b; }
+    :root[data-theme="dark"] input::placeholder { color: #a9b6ca; }
+    :root[data-theme="dark"] .secondary { color: #c9d8ff; background: #253657; }
+    :root[data-theme="dark"] .secondary:hover, :root[data-theme="dark"] .theme-toggle:hover { background: #30476e; }
+    :root[data-theme="dark"] .danger { color: #ffc3d0; background: #4d2534; }
+    :root[data-theme="dark"] .danger:hover { background: #673042; }
+    :root[data-theme="dark"] .progress { background: #2d3c57; }
+    :root[data-theme="dark"] .question-list { border-color: #374762; }
+    :root[data-theme="dark"] .question-item { border-color: #31415c; }
+    :root[data-theme="dark"] .question-item:hover { background: #243552; }
+    :root[data-theme="dark"] .level-easy { color: #79d7a7; }
+    :root[data-theme="dark"] .level-medium { color: #ffcb84; }
+    :root[data-theme="dark"] .level-hard { color: #ffa3c2; }
+    :root[data-theme="dark"] .feedback, :root[data-theme="dark"] .result-box { background: #293c60; color: #ebf1ff; }
+    :root[data-theme="dark"] .feedback.good { background: #18443a; }
+    :root[data-theme="dark"] .feedback.bad { background: #522838; }
+    :root[data-theme="dark"] .translation { background: #223455; color: #dce6fa; border-color: #88aafa; }
+    :root[data-theme="dark"] .translation strong { color: #b8ceff; }
+    :root[data-theme="dark"] .explain-example { background: #12243d; }
+    :root[data-theme="dark"] .answer-input:disabled { background: #26344b; }
+    @media (max-width: 520px) {
+      main { width: calc(100% - 24px); margin: 18px auto 40px; }
+      .card { padding: 18px; border-radius: 18px; }
+      .heading-row { align-items: center; }
+      .heading-row h1 { font-size: clamp(23px, 6vw, 29px); }
+      .theme-toggle { min-width: auto; padding: 10px; font-size: 13px; }
+      .question-list { max-height: 52vh; }
+      .browser-actions > button { flex: 1 1 140px; }
+      .browser-controls input[type="search"] { flex-basis: 100%; }
+      .controls > select { flex-basis: 100%; }
+      .controls > button { flex: 1 1 140px; }
+    }
+    [hidden] { display: none !important; }
+    @media (max-width: 520px) {
+      main { margin: 22px auto; }
+      .card { padding: 19px; }
+      .answer-form > button { flex: 1 1 100%; }
+      .controls > button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="heading-row"><h1>중1 영어 문법 500문제</h1><button class="theme-toggle" id="themeToggle" type="button" aria-label="블랙 모드로 전환" aria-pressed="false">🌙 블랙 모드</button></div>
+  <p class="subtitle">20개 주제 · 주제별 25문제 · 주관식 입력 · 즉시 채점 · 100점 환산</p>
+
+  <section class="card" aria-label="학습 설정">
+    <div class="controls">
+      <select id="topicSelect" aria-label="학습할 주제"><option value="all">전체 500문제</option></select>
+      <button class="primary" id="startBtn" type="button">▶ 문제 풀기</button>
+      <button class="secondary" id="reviewBtn" type="button">오답 다시 풀기</button>
+      <button class="danger" id="resetBtn" type="button">기록 초기화</button>
+    </div>
+    <div class="stats">
+      <span>전체 풀이 <strong id="totalSolved">0</strong></span>
+      <span>전체 정답 <strong id="totalCorrect">0</strong></span>
+      <span>남은 오답 <strong id="wrongCount">0</strong></span>
+      <span>이번 학습 점수 <strong class="score" id="sessionScore">0 / 100점</strong></span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="현재 학습 진행률"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
+      <div id="progressFill"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="문제 목록 및 선택">
+    <h2 class="browser-head">1~500번 문제 목록</h2>
+    <p class="browser-help">학습 순서 기준 쉬움 1~200번 · 보통 201~400번 · 도전 401~500번입니다. 검색하거나 난이도를 고른 뒤 체크한 문제만 풀 수도 있습니다.</p>
+    <div class="browser-controls">
+      <input id="questionSearch" type="search" placeholder="문제 번호·주제·문장 검색" aria-label="문제 검색">
+      <select id="difficultyFilter" aria-label="난이도 필터">
+        <option value="all">전체 난이도 (500)</option>
+        <option value="easy">쉬움 (1~200)</option>
+        <option value="medium">보통 (201~400)</option>
+        <option value="hard">도전 (401~500)</option>
+      </select>
+    </div>
+    <div class="browser-actions">
+      <button class="secondary" id="selectVisibleBtn" type="button">검색 결과 모두 선택</button>
+      <button class="secondary" id="clearSelectedBtn" type="button">선택 해제</button>
+      <button class="primary" id="startSelectedBtn" type="button" disabled>선택한 문제 풀기</button>
+      <span class="browser-count" id="browserCount" aria-live="polite">문제 목록을 불러오는 중…</span>
+    </div>
+    <div class="question-list" id="questionList" aria-label="문항 목록"><p class="empty-list">문항을 불러오는 중입니다…</p></div>
+  </section>
+
+  <section class="card" id="quizCard">
+    <div id="quizContent"><p class="muted">문제를 불러오는 중입니다… 화면이 그대로라면 미리보기를 새로고침해 주세요.</p></div>
+  </section>
+  <p class="references">문법 범위 참고: <a href="https://mid.ebs.co.kr/course/view?courseId=100006120" target="_blank" rel="noopener noreferrer">EBS 중학 뉴런 영어 1</a> · <a href="https://learnenglish.britishcouncil.org/free-resources/grammar/a1-a2" target="_blank" rel="noopener noreferrer">British Council A1–A2 Grammar</a> · <a href="https://test-english.com/grammar-points/contents/" target="_blank" rel="noopener noreferrer">Test-English A1 문법 목록</a><br>문제 문장은 참고 사이트에서 복사하지 않고 직접 구성했습니다. 인터넷 연결 없이도 문제 풀이와 채점이 됩니다.</p>
+</main>
+
+<script type="text/plain" id="legacyQuizCode">
+"use strict";
+
+/*
+ * EBS 중학 영어 1과 A1–A2 영문법 범위를 참고해 직접 만든 빈칸형 문항.
+ * 각 주제에서 5가지 × 5가지 조합으로 25문제를 만듭니다.
+ * 복수형·시간 전치사·의문사는 25개씩 직접 정의합니다.
+ * 20개 주제 × 25문제 = 정확히 500문제입니다.
+ * 기존 선택지 데이터는 문항 검증에만 사용하며 학습 화면에는 노출하지 않습니다.
+ */
+const bank = [];
+
+function add(topic, prompt, answer, choices, explanation) {
+  if (!choices.includes(answer) || new Set(choices).size < 4) {
+    throw new Error("선택지 오류: " + prompt);
+  }
+  bank.push({
+    id: bank.length,
+    topic,
+    prompt,
+    answer,
+    choices,
+    explanation
+  });
+}
+
+function combine(topic, first, second, make) {
+  if (first.length !== 5 || second.length !== 5) {
+    throw new Error(topic + ": 각 목록에는 5개가 필요합니다.");
+  }
+  for (const a of first) {
+    for (const b of second) {
+      const q = make(a, b);
+      add(topic, q[0], q[1], q[2], q[3]);
+    }
+  }
+}
+
+// 1. be동사의 현재형: 5 × 5 = 25
+combine(
+  "01. be동사의 현재형",
+  [["I", "am"], ["You", "are"], ["He", "is"], ["She", "is"], ["They", "are"]],
+  ["happy today", "busy now", "ready for class", "at school", "in the classroom"],
+  ([subject, answer], ending) => [
+    `${subject} ___ ${ending}.`,
+    answer,
+    ["am", "is", "are", "be"],
+    `현재형 be동사는 I → am, he/she → is, you/they → are를 씁니다.`
+  ]
+);
+
+// 2. 인칭대명사: 직접 작성한 5묶음 × 5개 = 25
+const pronounGroups = [
+  ["Tom is my friend.", "He",
+    ["___ is kind.", "___ is at school.", "___ is very tall.",
+     "___ is in this room.", "___ is busy today."]],
+  ["Mina is my friend.", "She",
+    ["___ is kind.", "___ is at school.", "___ is very tall.",
+     "___ is in this room.", "___ is busy today."]],
+  ["My dog is a pet.", "It",
+    ["___ is small.", "___ is cute.", "___ is at home.",
+     "___ is under the table.", "___ is sleeping."]],
+  ["Tom and Mina are friends.", "They",
+    ["___ are kind.", "___ are at school.", "___ are classmates.",
+     "___ are in this room.", "___ are busy today."]],
+  ["These books are new.", "They",
+    ["___ are on the desk.", "___ are interesting.", "___ are mine.",
+     "___ are in my bag.", "___ are about animals."]]
+];
+for (const [context, answer, endings] of pronounGroups) {
+  for (const ending of endings) {
+    add(
+      "02. 인칭대명사",
+      `${context} ${ending}`,
+      answer,
+      ["He", "She", "It", "They"],
+      `앞 문장의 대상이 누구인지 확인하세요. 이 문장에서는 ${answer}를 씁니다.`
+    );
+  }
+}
+
+// 3. a / an: 5 × 5 = 25
+combine(
+  "03. 관사 a / an",
+  ["I have", "She bought", "He needs", "We saw", "They found"],
+  [["apple", "an"], ["egg", "an"], ["book", "a"],
+   ["umbrella", "an"], ["uniform", "a"]],
+  (start, [noun, answer]) => [
+    `${start} ___ ${noun}.`,
+    answer,
+    ["a", "an", "many", "few"],
+    `관사는 철자가 아니라 첫소리로 고릅니다. '${noun}' 앞에는 '${answer}'을/를 씁니다.`
+  ]
+);
+
+// 4. 명사의 복수형: 25개
+const pluralNouns = [
+  ["book", "books", "bookes", "bookies"],
+  ["desk", "desks", "deskes", "deskies"],
+  ["cup", "cups", "cupes", "cupies"],
+  ["bag", "bags", "bages", "bagies"],
+  ["pen", "pens", "penes", "penies"],
+  ["bus", "buses", "buss", "busies"],
+  ["box", "boxes", "boxs", "boxies"],
+  ["dish", "dishes", "dishs", "dishies"],
+  ["watch", "watches", "watchs", "watchies"],
+  ["class", "classes", "classs", "classies"],
+  ["baby", "babies", "babys", "babyes"],
+  ["city", "cities", "citys", "cityes"],
+  ["story", "stories", "storys", "storyes"],
+  ["family", "families", "familys", "familyes"],
+  ["party", "parties", "partys", "partyes"],
+  ["child", "children", "childs", "childes"],
+  ["man", "men", "mans", "manes"],
+  ["woman", "women", "womans", "womanes"],
+  ["foot", "feet", "foots", "footes"],
+  ["tooth", "teeth", "tooths", "toothes"],
+  ["mouse", "mice", "mouses", "mousees"],
+  ["person", "people", "persons", "persones"],
+  ["sheep", "sheep", "sheeps", "sheepes"],
+  ["fish", "fish", "fishs", "fishes"],
+  ["deer", "deer", "deers", "deeres"]
+];
+for (const [singular, plural, wrong1, wrong2] of pluralNouns) {
+  add(
+    "04. 명사의 복수형",
+    `빈칸에 '${singular}'의 기본 복수형을 쓰세요: I see two ___.`,
+    plural,
+    [plural, singular, wrong1, wrong2],
+    `'${singular}'의 기본 복수형은 '${plural}'입니다.`
+  );
+}
+
+// 5. 소유격: 5 × 5 = 25
+combine(
+  "05. 소유격",
+  [["I", "My"], ["you", "Your"], ["he", "His"],
+   ["she", "Her"], ["we", "Our"]],
+  ["bag", "pencil", "book", "desk", "bike"],
+  ([owner, answer], noun) => [
+    `___ ${noun} is new. (주인: ${owner})`,
+    answer,
+    ["My", "Your", "His", "Her", "Our", "Their", "Its"],
+    `주인이 '${owner}'이므로 명사 앞에는 '${answer}'을/를 씁니다.`
+  ]
+);
+
+// 6. 지시대명사: 사물 5개 × 위치·개수 5가지 = 25
+const pointingCases = [
+  ["This", "가까이 있는 한 개", (one) => `___ is my ${one}.`],
+  ["That", "멀리 있는 한 개", (one) => `___ is my ${one}.`],
+  ["These", "가까이 있는 여러 개", (_, many) => `___ are my ${many}.`],
+  ["Those", "멀리 있는 여러 개", (_, many) => `___ are my ${many}.`],
+  ["This", "가까이 있는 한 개", (one) => `___ is not your ${one}.`]
+];
+combine(
+  "06. this / that / these / those",
+  [["pen", "pens"], ["book", "books"], ["cup", "cups"],
+   ["bag", "bags"], ["shoe", "shoes"]],
+  pointingCases,
+  ([one, many], [answer, hint, build]) => [
+    `${build(one, many)} (${hint})`,
+    answer,
+    ["This", "That", "These", "Those"],
+    `가까운 한 개는 This, 먼 한 개는 That, 가까운 여러 개는 These, 먼 여러 개는 Those입니다.`
+  ]
+);
+
+// 7. 일반동사 의문문: 5 × 5 = 25
+combine(
+  "07. Do / Does 의문문",
+  [["I", "Do"], ["you", "Do"], ["he", "Does"],
+   ["she", "Does"], ["they", "Do"]],
+  ["like music", "play soccer", "live here", "have a pen", "study English"],
+  ([subject, answer], verbPhrase) => [
+    `___ ${subject} ${verbPhrase}?`,
+    answer,
+    ["Do", "Does", "Is", "Are"],
+    `일반동사 의문문에서 he/she는 Does, I/you/they는 Do로 시작합니다.`
+  ]
+);
+
+// 8. 현재형 3인칭 단수: 5 × 5 = 25
+combine(
+  "08. 현재형 3인칭 단수",
+  ["He", "She", "Tom", "Mina", "My brother"],
+  [
+    ["play", "plays", "playing", "soccer"],
+    ["watch", "watches", "watching", "TV"],
+    ["study", "studies", "studying", "English"],
+    ["go", "goes", "going", "to school"],
+    ["read", "reads", "reading", "books"]
+  ],
+  (subject, [base, answer, ing, ending]) => [
+    `${subject} ___ ${ending} every day.`,
+    answer,
+    [answer, base, ing, `to ${base}`],
+    `주어가 3인칭 단수이고 반복되는 습관이므로 '${answer}'을/를 씁니다.`
+  ]
+);
+
+// 9. 일반동사 부정문: 5 × 5 = 25
+combine(
+  "09. 일반동사 부정문",
+  [["I", "don't"], ["You", "don't"], ["He", "doesn't"],
+   ["She", "doesn't"], ["They", "don't"]],
+  ["like milk", "play tennis", "eat meat", "drink coffee", "watch TV"],
+  ([subject, answer], phrase) => [
+    `${subject} ___ ${phrase}. (하지 않는다)`,
+    answer,
+    ["don't", "doesn't", "isn't", "aren't"],
+    `일반동사의 부정형은 I/you/they → don't, he/she → doesn't입니다.`
+  ]
+);
+
+// 10. be동사 부정문: 5 × 5 = 25
+combine(
+  "10. be동사 부정문",
+  [["I", "am not"], ["You", "aren't"], ["He", "isn't"],
+   ["She", "isn't"], ["They", "aren't"]],
+  ["hungry now", "busy today", "ready yet",
+   "at school today", "in the room now"],
+  ([subject, answer], ending) => [
+    `${subject} ___ ${ending}. (아니다)`,
+    answer,
+    ["am not", "isn't", "aren't", "don't"],
+    `be동사 부정형은 I → am not, he/she → isn't, you/they → aren't입니다.`
+  ]
+);
+
+// 11. 현재진행형: 5 × 5 = 25
+combine(
+  "11. 현재진행형",
+  [["I", "am"], ["He", "is"], ["She", "is"],
+   ["We", "are"], ["They", "are"]],
+  [
+    ["read", "reads", "reading", "a book"],
+    ["play", "plays", "playing", "soccer"],
+    ["watch", "watches", "watching", "TV"],
+    ["study", "studies", "studying", "English"],
+    ["eat", "eats", "eating", "lunch"]
+  ],
+  ([subject, be], [base, third, answer, ending]) => [
+    `${subject} ${be} ___ ${ending} now.`,
+    answer,
+    [answer, base, third, `to ${answer}`],
+    `지금 하고 있는 동작은 be동사 + 동사-ing로 나타냅니다: ${be} ${answer}.`
+  ]
+);
+
+// 12. 불규칙 동사의 과거형: 5 × 5 = 25
+combine(
+  "12. 불규칙 동사의 과거형",
+  ["I", "He", "She", "We", "They"],
+  [
+    ["go", "went", "goes", "going", "to the park"],
+    ["eat", "ate", "eats", "eating", "an apple"],
+    ["see", "saw", "sees", "seeing", "a movie"],
+    ["have", "had", "has", "having", "lunch"],
+    ["buy", "bought", "buys", "buying", "a notebook"]
+  ],
+  (subject, [base, answer, third, ing, ending]) => [
+    `${subject} ___ ${ending} yesterday.`,
+    answer,
+    [answer, base, third, ing],
+    `yesterday는 과거 시점을 나타냅니다. '${base}'의 과거형은 '${answer}'입니다.`
+  ]
+);
+
+// 13. 규칙 동사의 과거형: 5 × 5 = 25
+combine(
+  "13. 규칙 동사의 과거형",
+  ["I", "He", "She", "We", "They"],
+  [
+    ["play", "played", "plays", "playing", "soccer"],
+    ["watch", "watched", "watches", "watching", "TV"],
+    ["clean", "cleaned", "cleans", "cleaning", "the room"],
+    ["visit", "visited", "visits", "visiting", "the museum"],
+    ["help", "helped", "helps", "helping", "my friend"]
+  ],
+  (subject, [base, answer, third, ing, ending]) => [
+    `${subject} ___ ${ending} yesterday.`,
+    answer,
+    [answer, base, third, ing],
+    `yesterday는 과거 시점을 나타냅니다. '${base}'의 과거형은 '${answer}'입니다.`
+  ]
+);
+
+// 14. can / can't: 5 × 5 = 25
+const abilitySubjects = ["I", "You", "He", "She", "They"];
+const abilities = ["swim", "ride a bike", "play the piano", "speak English", "cook"];
+abilitySubjects.forEach((subject, i) => {
+  abilities.forEach((ability, j) => {
+    const possible = (i + j) % 2 === 0;
+    const answer = possible ? "can" : "can't";
+    add(
+      "14. can / can't",
+      `${subject} ___ ${ability}. (${possible ? "할 수 있다" : "할 수 없다"})`,
+      answer,
+      ["can", "can't", "doesn't", "isn't"],
+      `할 수 있으면 can, 할 수 없으면 can't를 씁니다.`
+    );
+  });
+});
+
+// 15. There is / There are: 5 × 5 = 25
+combine(
+  "15. There is / There are",
+  ["on the desk", "in the classroom", "on the shelf",
+   "in the bag", "on the table"],
+  [
+    ["a book", "There is"],
+    ["two books", "There are"],
+    ["an apple", "There is"],
+    ["three pencils", "There are"],
+    ["some water", "There is"]
+  ],
+  (place, [thing, answer]) => [
+    `___ ${thing} ${place}.`,
+    answer,
+    ["There is", "There are", "There am", "There be"],
+    `한 개 또는 셀 수 없는 명사에는 There is, 여러 개에는 There are를 씁니다.`
+  ]
+);
+
+// 16. 장소 전치사: 5 × 5 = 25
+combine(
+  "16. 장소 전치사",
+  ["box", "desk", "bed", "chair", "bag"],
+  [
+    ["in", "안에"],
+    ["on", "위에"],
+    ["under", "아래에"],
+    ["behind", "뒤에"],
+    ["near", "가까이에"]
+  ],
+  (place, [answer, korean]) => [
+    `The toy is ___ the ${place}. (그 ${place} ${korean})`,
+    answer,
+    ["in", "on", "under", "behind", "near"],
+    `장소를 나타내는 '${korean}'에 해당하는 전치사는 '${answer}'입니다.`
+  ]
+);
+
+// 17. 시간 전치사: 직접 작성한 25개
+const timePhrases = [
+  ["Monday", "on"], ["Tuesday", "on"], ["Friday", "on"],
+  ["Sunday", "on"], ["my birthday", "on"],
+  ["January", "in"], ["March", "in"], ["July", "in"],
+  ["December", "in"], ["2025", "in"],
+  ["the morning", "in"], ["the afternoon", "in"], ["the evening", "in"],
+  ["spring", "in"], ["winter", "in"],
+  ["7 o'clock", "at"], ["8 o'clock", "at"], ["noon", "at"],
+  ["midnight", "at"], ["night", "at"],
+  ["Monday morning", "on"], ["Friday afternoon", "on"],
+  ["June 1st", "on"], ["New Year's Day", "on"],
+  ["5 p.m.", "at"]
+];
+for (const [time, answer] of timePhrases) {
+  add(
+    "17. 시간 전치사",
+    `We meet ___ ${time}.`,
+    answer,
+    ["in", "on", "at", "to"],
+    `시간 표현 '${time}' 앞에는 '${answer}'을/를 씁니다.`
+  );
+}
+
+// 18. 의문사: 직접 작성한 25개
+const whQuestions = [
+  ["___ is your name? — My name is Jina.", "What"],
+  ["___ is your favorite color? — Blue.", "What"],
+  ["___ is this? — It is a pencil.", "What"],
+  ["___ do you want? — I want some water.", "What"],
+  ["___ is in the box? — A toy.", "What"],
+
+  ["___ is your bag? — It is under the desk.", "Where"],
+  ["___ do you live? — I live in Seoul.", "Where"],
+  ["___ is the library? — It is next to the school.", "Where"],
+  ["___ are my shoes? — They are by the door.", "Where"],
+  ["___ is Mina? — She is in the kitchen.", "Where"],
+
+  ["___ is your birthday? — It is in May.", "When"],
+  ["___ do you go to bed? — At ten.", "When"],
+  ["___ does school start? — At nine.", "When"],
+  ["___ is the party? — It is on Saturday.", "When"],
+  ["___ do you eat breakfast? — At seven.", "When"],
+
+  ["___ is that boy? — He is my brother.", "Who"],
+  ["___ is your English teacher? — Ms. Kim.", "Who"],
+  ["___ is at the door? — My dad.", "Who"],
+  ["___ is your best friend? — Jisu.", "Who"],
+  ["___ is calling? — My mother.", "Who"],
+
+  ["___ are you happy? — Because I passed the test.", "Why"],
+  ["___ are you late? — Because I missed the bus.", "Why"],
+  ["___ is he tired? — Because he ran a lot.", "Why"],
+  ["___ do you study English? — Because I enjoy it.", "Why"],
+  ["___ is she crying? — Because she is sad.", "Why"]
+];
+for (const [prompt, answer] of whQuestions) {
+  add(
+    "18. 의문사",
+    prompt,
+    answer,
+    ["What", "Where", "When", "Who", "Why"],
+    `대답의 종류를 살펴보세요. 이 질문에는 '${answer}'이/가 알맞습니다.`
+  );
+}
+
+// 19. to부정사: 5 × 5 = 25
+combine(
+  "19. to부정사",
+  [
+    ["I", "want"],
+    ["You", "hope"],
+    ["He", "plans"],
+    ["She", "decides"],
+    ["We", "need"]
+  ],
+  [
+    ["play", "playing", "plays", "soccer"],
+    ["read", "reading", "reads", "a book"],
+    ["visit", "visiting", "visits", "the museum"],
+    ["study", "studying", "studies", "English"],
+    ["buy", "buying", "buys", "a pencil"]
+  ],
+  ([subject, verb], [base, ing, third, ending]) => [
+    `${subject} ${verb} ___ ${ending}.`,
+    `to ${base}`,
+    [`to ${base}`, base, ing, third],
+    `이 문장에서는 '${verb}' 뒤에 to + 동사원형을 씁니다: to ${base}.`
+  ]
+);
+
+// 20. 미래 will / won't: 5 × 5 = 25
+const futureSubjects = ["I", "You", "He", "She", "They"];
+const futureActions = [
+  "play soccer tomorrow",
+  "visit the museum next week",
+  "read a book tonight",
+  "study English tomorrow",
+  "help my friend next Sunday"
+];
+futureSubjects.forEach((subject, i) => {
+  futureActions.forEach((action, j) => {
+    const positive = (i + j) % 2 === 0;
+    const answer = positive ? "will" : "won't";
+    add(
+      "20. 미래 will / won't",
+      `${subject} ___ ${action}. (${positive ? "할 것이다" : "하지 않을 것이다"})`,
+      answer,
+      ["will", "won't", "did", "was"],
+      `미래에 할 일은 will + 동사원형, 하지 않을 일은 won't + 동사원형입니다.`
+    );
+  });
+});
+
+// 문항 수 및 중복 검사
+if (bank.length !== 500 || new Set(bank.map(q => `${q.topic}|${q.prompt}`)).size !== 500) {
+  throw new Error("문제 생성 오류: 500개의 서로 다른 문제가 필요합니다.");
+}
+
+const KEY = "middle-school-english-grammar-500-v1";
+const topicSelect = document.getElementById("topicSelect");
+const quizContent = document.getElementById("quizContent");
+const progress = document.getElementById("progress");
+const progressFill = document.getElementById("progressFill");
+
+let history = { answered: 0, correct: 0, wrongIds: [] };
+let session = null;
+
+try {
+  const saved = JSON.parse(localStorage.getItem(KEY));
+  if (saved?.history) history = saved.history;
+  if (saved?.session) session = saved.session;
+} catch (_) {
+  // 저장 기능이 제한된 환경에서도 문제 풀이는 계속됩니다.
+}
+
+// 저장 기록이 손상되었더라도 앱을 실행할 수 있도록 기본값으로 복구합니다.
+if (!history || !Number.isFinite(history.answered) ||
+    !Number.isFinite(history.correct) || !Array.isArray(history.wrongIds)) {
+  history = { answered: 0, correct: 0, wrongIds: [] };
+}
+history.wrongIds = [...new Set(history.wrongIds.filter(
+  id => Number.isInteger(id) && id >= 0 && id < bank.length
+))];
+if (session && (!Array.isArray(session.order) ||
+    !session.order.every(id => Number.isInteger(id) && id >= 0 && id < bank.length) ||
+    !Number.isInteger(session.index) || session.index < 0 ||
+    !Number.isFinite(session.answered) || !Number.isFinite(session.correct) ||
+    (session.selected !== null && typeof session.selected !== "string"))) {
+  session = null;
+}
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ history, session }));
+  } catch (_) {}
+}
+
+function shuffle(items) {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function normalizeAnswer(value) {
+  return String(value).normalize("NFKC")
+    .replace(/[‘’ʼ]/g, "'")
+    .trim().replace(/\s+/g, " ")
+    .replace(/[.!?。！？]+$/g, "")
+    .trim().toLowerCase();
+}
+
+// 빈칸 전체를 채우는 같은 뜻의 축약형/풀어 쓴 형태만 함께 인정합니다.
+const equivalentForms = {
+  "won't": ["will not"], "can't": ["cannot", "can not"],
+  "don't": ["do not"], "doesn't": ["does not"],
+  "didn't": ["did not"], "isn't": ["is not"],
+  "aren't": ["are not"], "wasn't": ["was not"],
+  "weren't": ["were not"], "mustn't": ["must not"]
+};
+
+function isCorrect(input, question) {
+  const expected = normalizeAnswer(question.answer);
+  const accepted = [expected, ...(equivalentForms[expected] || [])];
+  return accepted.includes(normalizeAnswer(input));
+}
+
+function scoreText(correct, total) {
+  const score = total > 0 ? Math.round(correct / total * 1000) / 10 : 0;
+  return `${score} / 100점`;
+}
+
+const topics = [...new Set(bank.map(q => q.topic))];
+if (topics.length !== 20 || topics.some(topic =>
+    bank.filter(q => q.topic === topic).length !== 25)) {
+  throw new Error("문항 구성 오류: 20개 주제에 각 25문제가 필요합니다.");
+}
+topicSelect.append(new Option("전체 500문제", "all"));
+for (const topic of topics) topicSelect.append(new Option(`${topic} (25문제)`, topic));
+
+function start(mode = "all") {
+  let ids;
+  if (mode === "review") {
+    ids = history.wrongIds.filter(id => Number.isInteger(id) && bank[id]);
+    if (!ids.length) {
+      alert("다시 풀 오답이 없습니다.");
+      return;
+    }
+  } else if (mode === "all") {
+    ids = bank.map(q => q.id);
+  } else {
+    ids = bank.filter(q => q.topic === mode).map(q => q.id);
+  }
+
+  session = {
+    mode, order: shuffle(ids), index: 0, selected: null,
+    answered: 0, correct: 0, mistakes: []
+  };
+  save();
+  render();
+}
+
+function updateStats() {
+  document.getElementById("totalSolved").textContent = history.answered;
+  document.getElementById("totalCorrect").textContent = history.correct;
+  document.getElementById("wrongCount").textContent = history.wrongIds.length;
+  document.getElementById("reviewBtn").disabled = history.wrongIds.length === 0;
+
+  const total = session?.order?.length || 0;
+  const completed = Math.min(session?.answered || 0, total);
+  const percentage = total ? Math.round(completed / total * 100) : 0;
+  progressFill.style.width = `${percentage}%`;
+  progress.setAttribute("aria-valuenow", String(percentage));
+  document.getElementById("sessionScore").textContent =
+    scoreText(session?.correct || 0, total);
+}
+
+function showResult() {
+  quizContent.replaceChildren();
+
+  const title = document.createElement("h2");
+  title.textContent = "채점 완료!";
+  const summary = document.createElement("p");
+  summary.className = "result-box";
+  summary.textContent =
+    `${session.order.length}문제 중 ${session.correct}문제 정답 · ` +
+    `점수 ${scoreText(session.correct, session.order.length)} ` +
+    `(정답률 ${Math.round(session.correct / session.order.length * 100)}%)`;
+  const note = document.createElement("p");
+  note.className = "muted";
+  note.textContent = history.wrongIds.length
+    ? `다시 풀 수 있는 오답이 ${history.wrongIds.length}개 있습니다.`
+    : "남아 있는 오답이 없습니다.";
+  quizContent.append(title, summary, note);
+
+  if (Array.isArray(session.mistakes) && session.mistakes.length) {
+    const details = document.createElement("details");
+    const heading = document.createElement("summary");
+    heading.textContent = `이번 학습에서 틀린 문제 ${session.mistakes.length}개 확인`;
+    const list = document.createElement("ol");
+    list.className = "review-list";
+    for (const mistake of session.mistakes) {
+      const q = bank[mistake.id];
+      if (!q) continue;
+      const item = document.createElement("li");
+      item.textContent = `${q.topic} · ${q.prompt} 내 답: ${mistake.input} / 정답: ${q.answer} — ${q.explanation}`;
+      list.append(item);
+    }
+    details.append(heading, list);
+    quizContent.append(details);
+  }
+}
+
+function render() {
+  updateStats();
+
+  if (!session?.order?.length) {
+    quizContent.replaceChildren();
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "위에서 전체 500문제 또는 주제별 25문제를 선택한 뒤 문제 풀기를 누르세요.";
+    const begin = document.createElement("button");
+    begin.type = "button";
+    begin.className = "primary";
+    begin.textContent = "▶ 문제 풀기";
+    begin.addEventListener("click", () => start(topicSelect.value));
+    quizContent.append(p, begin);
+    return;
+  }
+  if (session.index >= session.order.length) {
+    showResult();
+    return;
+  }
+
+  const question = bank[session.order[session.index]];
+  if (!question) {
+    session = null;
+    save();
+    render();
+    return;
+  }
+  quizContent.replaceChildren();
+
+  const eyebrow = document.createElement("div");
+  eyebrow.className = "eyebrow";
+  eyebrow.textContent =
+    `${question.topic} · ${session.index + 1} / ${session.order.length}`;
+  const heading = document.createElement("h2");
+  heading.className = "question";
+  heading.textContent = question.prompt;
+  quizContent.append(eyebrow, heading);
+
+  const form = document.createElement("form");
+  form.className = "answer-form";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "answer-input";
+  input.setAttribute("aria-label", "빈칸에 들어갈 영어 정답");
+  input.placeholder = "빈칸의 영어 정답을 입력하세요";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.required = true;
+  input.maxLength = 120;
+  input.value = session.selected ?? "";
+  input.disabled = session.selected !== null;
+  input.addEventListener("input", () => input.setCustomValidity(""));
+
+  const checkButton = document.createElement("button");
+  checkButton.type = "submit";
+  checkButton.className = "primary";
+  checkButton.textContent = "채점하기";
+  checkButton.disabled = session.selected !== null;
+  form.append(input, checkButton);
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!input.value.trim()) {
+      input.setCustomValidity("정답을 입력하세요.");
+      input.reportValidity();
+      return;
+    }
+    answer(input.value);
+  });
+  quizContent.append(form);
+
+  if (session.selected !== null) {
+    const correct = isCorrect(session.selected, question);
+    const feedback = document.createElement("div");
+    feedback.className = `feedback ${correct ? "good" : "bad"}`;
+    feedback.setAttribute("role", "status");
+    const result = document.createElement("strong");
+    result.textContent = correct
+      ? "정답입니다! 점수가 올라갔어요."
+      : `오답입니다. 정답: ${question.answer}`;
+    const explanation = document.createElement("div");
+    explanation.textContent = question.explanation;
+    feedback.append(result, explanation);
+
+    const nextRow = document.createElement("div");
+    nextRow.className = "next-row";
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "primary";
+    next.textContent =
+      session.index === session.order.length - 1 ? "최종 점수 보기" : "다음 문제";
+    next.addEventListener("click", nextQuestion);
+    nextRow.append(next);
+    quizContent.append(feedback, nextRow);
+    next.focus();
+  } else {
+    const hint = document.createElement("p");
+    hint.className = "hint";
+    hint.textContent = "영어 단어·표현을 직접 입력하세요. Enter를 누르면 채점합니다. 대소문자·끝 문장부호·앞뒤 공백은 채점에서 제외합니다.";
+    quizContent.append(hint);
+    input.focus();
+  }
+}
+
+function answer(value) {
+  if (!session || session.index >= session.order.length ||
+      session.selected !== null || !normalizeAnswer(value)) return;
+
+  const question = bank[session.order[session.index]];
+  session.selected = value.trim();
+  session.answered++;
+  history.answered++;
+
+  if (isCorrect(value, question)) {
+    session.correct++;
+    history.correct++;
+    history.wrongIds = history.wrongIds.filter(id => id !== question.id);
+  } else {
+    if (!history.wrongIds.includes(question.id)) history.wrongIds.push(question.id);
+    if (!Array.isArray(session.mistakes)) session.mistakes = [];
+    session.mistakes.push({ id: question.id, input: value.trim() });
+  }
+  save();
+  render();
+}
+
+function nextQuestion() {
+  if (!session || session.selected === null) return;
+  session.index++;
+  session.selected = null;
+  save();
+  render();
+}
+
+document.getElementById("startBtn").addEventListener("click", () => {
+  start(topicSelect.value);
+});
+document.getElementById("reviewBtn").addEventListener("click", () => {
+  start("review");
+});
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("풀이 기록과 오답 목록을 모두 삭제할까요?")) return;
+  history = { answered: 0, correct: 0, wrongIds: [] };
+  session = null;
+  save();
+  render();
+});
+
+render();
+</script>
+<script>
+(() => {
+  "use strict";
+  const el = id => document.getElementById(id);
+  const view = el("quizContent");
+  try {
+    const bank = [];
+    const make = (topic, prompt, answer, explanation) => {
+      bank.push({ id: bank.length, topic, prompt, answer, explanation });
+    };
+    const grid = (topic, rows, cols, build) => {
+      if (rows.length !== 5 || cols.length !== 5) throw Error(`${topic}: 5×5 문항이 아닙니다.`);
+      for (const row of rows) for (const col of cols) {
+        const [prompt, answer, explanation] = build(row, col);
+        make(topic, prompt, answer, explanation);
+      }
+    };
+
+    // 01. be동사 현재형: 5×5
+    grid("01. be동사 현재형",
+      [["I", "am"], ["You", "are"], ["He", "is"], ["She", "is"], ["They", "are"]],
+      ["at home now", "in the library today", "ready for the test", "very tired today", "in the classroom now"],
+      ([s, a], end) => [`${s} ___ ${end}.`, a, `${s}에는 현재형 be동사 ${a}를 씁니다.`]);
+
+    // 02. 인칭대명사: 5×5
+    grid("02. 인칭대명사",
+      [["Minho is my brother.", "He", "is"], ["Jina is my sister.", "She", "is"],
+       ["This is my puppy.", "It", "is"], ["Minho and Jina are friends.", "They", "are"],
+       ["These pencils belong to me.", "They", "are"]],
+      ["here now", "near the window", "in the classroom", "outside the room", "by the door"],
+      ([context, a, be], end) => [`${context} ___ ${be} ${end}.`, a, `앞 문장의 대상을 가리키는 주격 대명사는 ${a}입니다.`]);
+
+    // 03. a / an: 5×5
+    grid("03. 관사 a / an",
+      ["I found", "She bought", "He needs", "We saw", "They found"],
+      [["apple", "an"], ["umbrella", "an"], ["orange", "an"], ["book", "a"], ["uniform", "a"]],
+      (start, [noun, a]) => [`${start} ___ ${noun}.`, a, `${noun}의 첫소리에 따라 ${a}를 씁니다.`]);
+
+    // 04. 명사의 복수형: 각각 직접 정의한 25개
+    const plurals = [
+      ["book","books"],["desk","desks"],["cup","cups"],["bag","bags"],["pen","pens"],
+      ["bus","buses"],["box","boxes"],["dish","dishes"],["watch","watches"],["class","classes"],
+      ["baby","babies"],["city","cities"],["toy","toys"],["key","keys"],["photo","photos"],
+      ["child","children"],["man","men"],["woman","women"],["person","people"],["mouse","mice"],
+      ["foot","feet"],["tooth","teeth"],["sheep","sheep"],["deer","deer"],["fish","fish"]
+    ];
+    for (const [single, plural] of plurals)
+      make("04. 명사의 복수형", `복수형을 쓰세요: one ${single} → two ___`, plural,
+        `${single}의 복수형은 ${plural}입니다.`);
+
+    // 05. 지시대명사 this / that / these / those: 5×5
+    grid("05. 지시대명사",
+      [["key", "is", false], ["keys", "are", true], ["coin", "is", false],
+       ["coins", "are", true], ["pens", "are", true]],
+      [["in my hand", true], ["right next to me", true], ["here by my feet", true],
+       ["across the room", false], ["over there by the door", false]],
+      ([noun, be, plural], [place, near]) => {
+        const a = near ? (plural ? "These" : "This") : (plural ? "Those" : "That");
+        return [`Look at the ${noun} ${place}. ___ ${be} mine.`, a,
+          `가까우면 this/these, 멀면 that/those를 쓰고, 복수이면 these/those를 씁니다.`];
+      });
+
+    // 06. 소유격: 5×5
+    grid("06. 소유격",
+      [["I", "own", "my"], ["You", "own", "your"], ["He", "owns", "his"],
+       ["She", "owns", "her"], ["We", "own", "our"]],
+      ["bag", "pen", "bike", "book", "pencil"],
+      ([s, verb, a], noun) => [`${s} ${verb} a ${noun}. This is ___ ${noun}.`, a,
+        `${s}의 소유격은 ${a}입니다.`]);
+
+    // 07. have / has: 5×5
+    grid("07. have / has",
+      [["I", "have"], ["You", "have"], ["He", "has"], ["She", "has"], ["They", "have"]],
+      ["a pencil", "two sisters", "a new bike", "some homework", "an idea"],
+      ([s, a], ending) => [`${s} ___ ${ending}.`, a, `${s}에는 ${a}를 씁니다.`]);
+
+    // 08. 일반동사 3인칭 단수: 5×5
+    grid("08. 일반동사 3인칭 단수",
+      [["He", "every day"], ["She", "every morning"], ["Tom", "after school"],
+       ["My sister", "on weekends"], ["My father", "every Sunday"]],
+      [["play", "plays", "soccer"], ["read", "reads", "books"], ["study", "studies", "English"],
+       ["wash", "washes", "the dishes"], ["go", "goes", "to the gym"]],
+      ([s, when], [base, a, obj]) => [`${s} ___ ${obj} ${when}. (${base})`, a,
+        `3인칭 단수 현재형: ${base} → ${a}`]);
+
+    // 09. do / does 의문문: 5×5
+    grid("09. do / does 의문문",
+      [["you", "Do"], ["he", "Does"], ["she", "Does"], ["Tom", "Does"], ["they", "Do"]],
+      ["like cats", "eat breakfast early", "play tennis", "live near here", "speak English"],
+      ([s, a], ending) => [`___ ${s} ${ending}?`, a,
+        `주어가 3인칭 단수이면 Does, 그 밖에는 Do를 씁니다.`]);
+
+    // 10. don't / doesn't 부정문: 5×5
+    grid("10. 일반동사 부정문",
+      [["I", "don't"], ["You", "don't"], ["He", "doesn't"], ["She", "doesn't"], ["They", "don't"]],
+      ["eat meat", "like rainy days", "play basketball", "drink coffee", "watch TV at night"],
+      ([s, a], ending) => [`${s} ___ ${ending}. (부정문)`, a,
+        `현재시제 부정문에서 ${s}에는 ${a}를 씁니다.`]);
+
+    // 11. 현재진행형: 5×5
+    grid("11. 현재진행형",
+      [["I", "am"], ["You", "are"], ["He", "is"], ["She", "is"], ["They", "are"]],
+      ["reading a book", "playing outside", "studying English", "watching TV", "eating lunch"],
+      ([s, a], ending) => [`${s} ___ ${ending} now.`, a,
+        `현재진행형은 am/is/are + 동사-ing이며, ${s}에는 ${a}를 씁니다.`]);
+
+    // 12. be동사 과거형: 5×5
+    grid("12. be동사 과거형",
+      [["I", "was"], ["You", "were"], ["He", "was"], ["We", "were"], ["They", "were"]],
+      ["at home yesterday", "very tired last night", "late for class this morning",
+       "at the park last Sunday", "happy after the game yesterday"],
+      ([s, a], ending) => [`${s} ___ ${ending}.`, a,
+        `be동사의 과거형은 I/he/she에는 was, you/we/they에는 were를 씁니다.`]);
+
+    // 13. 규칙동사 과거형: 5×5
+    grid("13. 규칙동사 과거형",
+      ["I", "He", "She", "We", "They"],
+      [["paint", "painted", "a picture"], ["wash", "washed", "the dishes"],
+       ["clean", "cleaned", "the room"], ["visit", "visited", "the museum"],
+       ["study", "studied", "English"]],
+      (s, [base, a, obj]) => [`${s} ___ ${obj} yesterday. (${base})`, a,
+        `규칙동사 과거형: ${base} → ${a}`]);
+
+    // 14. 불규칙동사 과거형: 5×5
+    grid("14. 불규칙동사 과거형",
+      [["go", "went", "to the park"], ["eat", "ate", "an apple"],
+       ["see", "saw", "a movie"], ["write", "wrote", "a letter"], ["buy", "bought", "a book"]],
+      ["yesterday", "last Monday", "last Saturday", "last summer", "two days ago"],
+      ([base, a, obj], when) => [`I ___ ${obj} ${when}. (${base})`, a,
+        `불규칙동사 과거형: ${base} → ${a}`]);
+
+    // 15. 미래 will: 5×5
+    grid("15. 미래 표현 will",
+      ["I", "You", "He", "She", "They"],
+      ["study tonight", "visit the museum tomorrow", "call the teacher later",
+       "help the team next week", "arrive soon"],
+      (s, end) => [`${s} ___ ${end}. (미래)`, "will",
+        `미래를 나타낼 때 주어 뒤에 will + 동사원형을 씁니다.`]);
+
+    // 16. 능력 표현 can / can't: 5×5
+    grid("16. 조동사 can / can't",
+      [["I", true], ["She", true], ["He", false], ["They", false], ["We", true]],
+      ["swim", "ride a bike", "play the piano", "speak French", "cook pasta"],
+      ([s, able], verb) => [`${s} ${able ? "know" : "do not know"} how to ${verb}. ${s} ___ ${verb}.`,
+        able ? "can" : "can't", `할 수 있으면 can, 할 수 없으면 can't를 씁니다.`]);
+
+    // 17. 의무·금지 must / mustn't: 5×5
+    grid("17. must / mustn't",
+      ["You", "We", "Students", "They", "Children"],
+      [["wear a seat belt", true], ["be quiet in the library", true],
+       ["wash hands before eating", true], ["run in the hallway", false],
+       ["touch hot stoves", false]],
+      (s, [action, required]) => [`Rule: Everyone ${required ? "is required" : "is forbidden"} to ${action}. ${s} ___ ${action}.`,
+        required ? "must" : "mustn't", `의무는 must, 금지는 mustn't를 씁니다.`]);
+
+    // 18. 장소 전치사: 5×5
+    grid("18. 장소 전치사",
+      [["ball", "box"], ["book", "bag"], ["toy", "basket"],
+       ["pen", "drawer"], ["key", "cup"]],
+      [["안에", "in"], ["위에", "on"], ["아래에", "under"],
+       ["뒤에", "behind"], ["옆에", "next to"]],
+      ([item, place], [ko, a]) => [`${item}가 ${place} ${ko} 있습니다. The ${item} is ___ the ${place}.`, a,
+        `‘${ko}’를 나타내는 장소 전치사는 ${a}입니다.`]);
+
+    // 19. 시간 전치사: 5×5
+    grid("19. 시간 전치사",
+      ["We meet", "She studies", "He gets up", "They play soccer", "The class starts"],
+      [["8 o'clock", "at"], ["Monday", "on"], ["July", "in"],
+       ["the morning", "in"], ["Friday night", "on"]],
+      (start, [when, a]) => [`${start} ___ ${when}.`, a,
+        `시각은 at, 요일·특정 날짜는 on, 달·하루의 시간대는 in을 씁니다.`]);
+
+    // 20. 의문사: 문장마다 질문 의도까지 제시한 25개
+    const wh = [
+      ["누구", "Who", ["___ is your teacher?", "___ is at the door?", "___ has my pencil?", "___ is calling you?", "___ can help us?"]],
+      ["무엇", "What", ["___ is your name?", "___ is in the box?", "___ do you want to eat?", "___ color is your bag?", "___ is your favorite sport?"]],
+      ["어디", "Where", ["___ is the library?", "___ do you live?", "___ are my shoes?", "___ is Tom going?", "___ can I find a pen?"]],
+      ["언제", "When", ["___ is your birthday?", "___ does the class start?", "___ do you go to bed?", "___ is the school trip?", "___ will she arrive?"]],
+      ["왜", "Why", ["___ are you sad?", "___ is he late?", "___ do we need water?", "___ does she study English?", "___ are they laughing?"]]
+    ];
+    for (const [meaning, answer, stems] of wh) for (const stem of stems)
+      make("20. 의문사", `‘${meaning}’를 묻는 질문: ${stem}`, answer,
+        `‘${meaning}’를 묻는 의문사는 ${answer}입니다.`);
+
+    const topics = [...new Set(bank.map(q => q.topic))];
+    if (bank.length !== 500 || topics.length !== 20 ||
+        topics.some(t => bank.filter(q => q.topic === t).length !== 25) ||
+        new Set(bank.map(q => q.prompt)).size !== 500 ||
+        bank.some(q => !q.answer || !q.prompt.includes("___"))) {
+      throw Error("문항 검증 실패: 20개 주제의 서로 다른 500문항이 필요합니다.");
+    }
+    // 능력 표현의 예문에서 3인칭 단수 부정문을 올바르게 씁니다.
+    for (const q of bank) {
+      if (q.topic === "16. 조동사 can / can't")
+        q.prompt = q.prompt.replace(/^He do not know /, "He does not know ");
+    }
+
+    const select = el("topicSelect");
+    select.replaceChildren(new Option("전체 500문제", "all"));
+    for (const topic of topics) select.add(new Option(`${topic} (25문제)`, topic));
+
+    const KEY = "grade1-english-grammar-500-v3";
+    let history = { answered: 0, correct: 0, wrongIds: [] };
+    let session = null;
+    let selectedIds = new Set();
+    try {
+      const stored = JSON.parse(localStorage.getItem(KEY) || "null");
+      if (stored && stored.history) {
+        history.answered = Math.max(0, Number(stored.history.answered) || 0);
+        history.correct = Math.max(0, Number(stored.history.correct) || 0);
+        history.wrongIds = Array.isArray(stored.history.wrongIds)
+          ? [...new Set(stored.history.wrongIds.filter(id => Number.isInteger(id) && id >= 0 && id < 500))] : [];
+      }
+      if (Array.isArray(stored?.selectedIds)) {
+        selectedIds = new Set(stored.selectedIds.filter(id =>
+          Number.isInteger(id) && id >= 0 && id < bank.length));
+      }
+      const s = stored?.session;
+      if (s && Array.isArray(s.order) && s.order.length > 0 &&
+          s.order.every(id => Number.isInteger(id) && id >= 0 && id < 500) &&
+          Number.isInteger(s.index) && s.index >= 0 && s.index <= s.order.length &&
+          Number.isInteger(s.correct) && Number.isInteger(s.answered)) {
+        session = { ...s, mistakes: Array.isArray(s.mistakes) ? s.mistakes : [],
+          selected: typeof s.selected === "string" ? s.selected : null };
+      }
+    } catch (error) { console.warn("이전 기록을 읽을 수 없어 새로 시작합니다.", error); }
+    const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ history, session, selectedIds: [...selectedIds] })); }
+      catch (error) { console.warn("저장 기능을 사용할 수 없습니다.", error); } };
+    const normalized = text => String(text).toLowerCase().replace(/[‘’]/g, "'")
+      .trim().replace(/[.!?]+$/g, "").replace(/\s+/g, " ");
+    const isCorrect = (value, q) => {
+      const a = normalized(q.answer);
+      const alternatives = { "can't": ["cannot", "can not"], "don't": ["do not"],
+        "doesn't": ["does not"], "mustn't": ["must not"] };
+      return [a, ...(alternatives[a] || [])].includes(normalized(value));
+    };
+    const score = (correct, total) => `${total ? (Math.round(correct / total * 1000) / 10) : 0} / 100점`;
+    const shuffle = ids => {
+      const arr = [...ids];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+    const textNode = (tag, value, className) => {
+      const node = document.createElement(tag);
+      node.textContent = value;
+      if (className) node.className = className;
+      return node;
+    };
+    const difficulty = q => q.id < 200 ? "easy" : q.id < 400 ? "medium" : "hard";
+    const difficultyLabel = q => ({ easy: "쉬움", medium: "보통", hard: "도전" })[difficulty(q)];
+    function visibleQuestions() {
+      const term = normalized(el("questionSearch").value);
+      const level = el("difficultyFilter").value;
+      return bank.filter(q => {
+        if (level !== "all" && difficulty(q) !== level) return false;
+        if (!term) return true;
+        if (/^\d+$/.test(term)) return q.id + 1 === Number(term);
+        return normalized(`${q.topic} ${q.prompt} ${difficultyLabel(q)}`).includes(term);
+      });
+    }
+    function updateBrowserCount(count) {
+      el("browserCount").textContent = `검색 결과 ${count}문제 · 선택 ${selectedIds.size}문제`;
+      el("startSelectedBtn").disabled = selectedIds.size === 0;
+      el("selectVisibleBtn").disabled = count === 0;
+      el("clearSelectedBtn").disabled = selectedIds.size === 0;
+    }
+    function renderBrowser() {
+      const visible = visibleQuestions();
+      const list = el("questionList");
+      const fragment = document.createDocumentFragment();
+      if (!visible.length) fragment.append(textNode("p", "검색 결과가 없습니다. 검색어나 난이도를 바꿔 보세요.", "empty-list"));
+      for (const q of visible) {
+        const item = document.createElement("label");
+        item.className = "question-item";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = String(q.id);
+        checkbox.checked = selectedIds.has(q.id);
+        checkbox.setAttribute("aria-label", `${q.id + 1}번 문제 선택`);
+        const info = document.createElement("span");
+        info.className = "item-info";
+        const meta = textNode("span", `${q.id + 1}번 · ${difficultyLabel(q)} · ${q.topic}`, `item-meta level-${difficulty(q)}`);
+        const prompt = textNode("span", q.prompt);
+        info.append(meta, prompt);
+        item.append(checkbox, info);
+        fragment.append(item);
+      }
+      list.replaceChildren(fragment);
+      updateBrowserCount(visible.length);
+    }
+    function stats() {
+      el("totalSolved").textContent = history.answered;
+      el("totalCorrect").textContent = history.correct;
+      el("wrongCount").textContent = history.wrongIds.length;
+      el("reviewBtn").disabled = history.wrongIds.length === 0;
+      const total = session?.order?.length || 0;
+      const percent = total ? Math.round(Math.min(session.answered, total) / total * 100) : 0;
+      el("progressFill").style.width = `${percent}%`;
+      el("progress").setAttribute("aria-valuenow", String(percent));
+      el("sessionScore").textContent = score(session?.correct || 0, total);
+    }
+    function start(mode = "all") {
+      const ids = mode === "review" ? [...history.wrongIds]
+        : mode === "selected" ? [...selectedIds]
+        : mode === "all" ? bank.map(q => q.id)
+        : bank.filter(q => q.topic === mode).map(q => q.id);
+      if (!ids.length) {
+        alert(mode === "review" ? "다시 풀 오답이 없습니다." :
+          mode === "selected" ? "먼저 목록에서 문제를 체크해 주세요." : "주제를 선택해 주세요.");
+        return;
+      }
+      // 전체·주제·선택 문제는 번호 순서대로 풀고, 오답 다시 풀기만 섞습니다.
+      session = { mode, order: mode === "review" ? shuffle(ids) : ids.sort((a, b) => a - b),
+        index: 0, selected: null, answered: 0, correct: 0, mistakes: [] };
+      save(); render();
+      el("quizCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    function finish() {
+      view.replaceChildren(
+        textNode("h2", "채점 완료!"),
+        textNode("p", `${session.order.length}문제 중 ${session.correct}개 정답 · ${score(session.correct, session.order.length)}`, "result-box"),
+        textNode("p", `다시 풀 수 있는 오답: ${history.wrongIds.length}개`, "muted")
+      );
+      if (session.mistakes.length) {
+        const details = document.createElement("details");
+        const title = textNode("summary", `이번 학습의 오답 ${session.mistakes.length}개 확인`);
+        const list = document.createElement("ol");
+        list.className = "review-list";
+        for (const miss of session.mistakes) {
+          const q = bank[miss.id];
+          if (q) list.append(textNode("li", `${q.id + 1}번 · ${q.prompt} | 내 답: ${miss.input} | 정답: ${q.answer} — ${q.explanation}`));
+        }
+        details.append(title, list);
+        view.append(details);
+      }
+      const retry = textNode("button", "다시 문제 풀기", "primary");
+      retry.type = "button";
+      retry.addEventListener("click", () => start(select.value));
+      view.append(retry);
+    }
+    function grammarTip(topic) {
+      const rules = [
+        [/be동사.*과거|과거.*be동사/i, "과거형 be동사는 I·he·she·it(단수)와 was, you·we·they(복수)와 were를 씁니다. you는 한 사람을 가리켜도 were입니다."],
+        [/be동사/i, "현재형 be동사는 주어에 따라 am(I), is(he·she·it 또는 단수), are(you·we·they 또는 복수)로 나눠 고릅니다."],
+        [/일반동사.*과거|과거.*일반동사|과거시제/i, "yesterday, last week처럼 과거를 나타내는 말이 있으면 동사의 과거형을 생각하세요. did 뒤에는 동사원형을 씁니다."],
+        [/현재진행/i, "‘지금 ~하는 중’이면 be동사(am/is/are) + 동사-ing를 사용합니다. 주어에 맞는 be동사도 확인하세요."],
+        [/현재.*일반동사|3인칭|현재형/i, "현재형에서 he·she·it처럼 3인칭 단수 주어라면 일반동사에 보통 -(e)s가 붙습니다. does 뒤에는 동사원형을 씁니다."],
+        [/미래|going to|will/i, "미래의 일은 will + 동사원형 또는 be going to + 동사원형으로 나타냅니다. 미래 표현 뒤의 동사 형태를 확인하세요."],
+        [/can|조동사/i, "can과 can't는 능력이나 가능성을 나타냅니다. 뒤에는 주어와 관계없이 동사원형을 씁니다."],
+        [/관사|a\/an/i, "a와 an은 바로 뒤에 오는 말의 ‘철자’보다 첫소리를 기준으로 고릅니다. 모음 소리 앞에는 an을 씁니다."],
+        [/복수/i, "두 개 이상이면 명사의 복수형을 씁니다. 보통 -s를 붙이지만 -es가 붙거나 형태가 달라지는 단어도 있습니다."],
+        [/대명사|소유/i, "대명사는 문장에서 하는 역할에 따라 형태가 달라집니다. 주어 자리인지, 목적어 자리인지, ‘~의’처럼 소유를 나타내는지 확인하세요."],
+        [/의문사/i, "의문사는 무엇을 묻는지에 따라 고릅니다. who(누구), what(무엇), when(언제), where(어디), why(왜), how(어떻게)를 구별하세요."],
+        [/전치사/i, "전치사는 뒤의 명사와 함께 시간·장소 등의 관계를 나타냅니다. 날짜, 요일, 시각처럼 뒤에 오는 표현을 먼저 살펴보세요."],
+        [/비교/i, "두 대상을 비교하면 비교급을, 셋 이상 중 가장 높은 정도를 말하면 최상급을 확인하세요."],
+        [/명령|청유/i, "명령문은 보통 동사원형으로 시작합니다. 부정 명령문이라면 Don't + 동사원형을 사용합니다."],
+        [/there is|there are/i, "‘~이 있다’는 뜻의 there is/are에서 뒤의 명사가 하나면 is, 여러 개면 are를 씁니다."]
+      ];
+      return rules.find(([pattern]) => pattern.test(topic))?.[1] ??
+        "빈칸 앞의 주어와 빈칸 뒤의 단어, 시간을 나타내는 말을 표시한 다음 어떤 형태가 자연스러운지 확인하세요.";
+    }
+    function addExplanation(feedback, q) {
+      feedback.append(
+        textNode("p", `① 문장 살펴보기: 빈칸의 앞뒤를 읽고 주어, 시간 표현, 필요한 단어의 역할을 찾으세요. 이 문제의 정답은 ‘${q.answer}’입니다.`, "explain-paragraph"),
+        textNode("p", `② 정답인 이유: ${q.explanation}`, "explain-paragraph"),
+        textNode("p", `③ 기억할 규칙: ${grammarTip(q.topic)}`, "explain-paragraph")
+      );
+      const completed = q.prompt.replace(/_{2,}|＿{2,}|□{2,}|\(\s*\)/, q.answer);
+      if (completed !== q.prompt) feedback.append(textNode("div", `완성된 문장: ${completed}`, "explain-example"));
+    }
+    // 문항 ID는 주제당 25개(5행 × 5열) 순서로 생성됩니다.
+    // 각 문항의 한국어 뜻은 해당 주제·행·열에 맞춘 원문 번역입니다.
+    function translateQuestion(q) {
+      const section = Math.floor(q.id / 25) + 1;
+      const row = Math.floor((q.id % 25) / 5);
+      const col = q.id % 5;
+      const pick = (items, index) => items[index];
+      const basicSubjects = ["나는", "너는", "그는", "그녀는", "그들은"];
+      let meaning = "";
+      switch (section) {
+        case 1:
+          meaning = `${basicSubjects[row]} ${pick(["지금 집에 있다", "오늘 도서관에 있다", "시험을 볼 준비가 되어 있다", "오늘 매우 피곤하다", "지금 교실에 있다"], col)}.`;
+          break;
+        case 2: {
+          const context = ["민호는 내 남자 형제이다", "지나는 내 여자 형제이다", "이것은 내 강아지이다", "민호와 지나는 친구이다", "이 연필들은 내 것이다"];
+          const referent = ["그는", "그녀는", "그 강아지는", "그들은", "그 연필들은"];
+          meaning = `${context[row]}. ${referent[row]} ${pick(["지금 여기에 있다", "창문 근처에 있다", "교실에 있다", "방 밖에 있다", "문 옆에 있다"], col)}.`;
+          break;
+        }
+        case 3: {
+          const obj = ["사과를", "우산을", "오렌지를", "책을", "유니폼을"];
+          const needed = ["사과가", "우산이", "오렌지가", "책이", "유니폼이"];
+          meaning = [
+            `나는 ${obj[col]} 찾았다.`, `그녀는 ${obj[col]} 샀다.`,
+            `그는 ${needed[col]} 필요하다.`, `우리는 ${obj[col]} 보았다.`,
+            `그들은 ${obj[col]} 찾았다.`
+          ][row];
+          break;
+        }
+        case 4:
+          meaning = `복수형을 쓰세요: ${pick([
+            "책 한 권 → 책 두 권", "책상 한 개 → 책상 두 개", "컵 한 개 → 컵 두 개", "가방 한 개 → 가방 두 개", "펜 한 자루 → 펜 두 자루",
+            "버스 한 대 → 버스 두 대", "상자 한 개 → 상자 두 개", "접시 한 개 → 접시 두 개", "시계 한 개 → 시계 두 개", "학급 한 반 → 학급 두 반",
+            "아기 한 명 → 아기 두 명", "도시 한 곳 → 도시 두 곳", "장난감 한 개 → 장난감 두 개", "열쇠 한 개 → 열쇠 두 개", "사진 한 장 → 사진 두 장",
+            "어린이 한 명 → 어린이 두 명", "남자 한 명 → 남자 두 명", "여자 한 명 → 여자 두 명", "사람 한 명 → 사람 두 명", "쥐 한 마리 → 쥐 두 마리",
+            "발 한 개 → 발 두 개", "이 한 개 → 이 두 개", "양 한 마리 → 양 두 마리", "사슴 한 마리 → 사슴 두 마리", "물고기 한 마리 → 물고기 두 마리"
+          ], q.id % 25)}.`;
+          break;
+        case 5: {
+          const things = ["열쇠", "열쇠들", "동전", "동전들", "펜들"];
+          const locations = ["내 손에 있는", "바로 내 옆에 있는", "여기 내 발 옆에 있는", "방 건너편에 있는", "저쪽 문 옆에 있는"];
+          const demonstrative = col < 3 ? (row === 1 || row >= 3 ? "이것들은" : "이것은") : (row === 1 || row >= 3 ? "저것들은" : "저것은");
+          meaning = `${locations[col]} ${things[row]}을/를 봐. ${demonstrative} 내 것이다.`;
+          meaning = meaning.replace("열쇠을/를", "열쇠를").replace("열쇠들을/를", "열쇠들을").replace("동전을/를", "동전을").replace("동전들을/를", "동전들을").replace("펜들을/를", "펜들을");
+          break;
+        }
+        case 6: {
+          const owned = ["가방", "펜", "자전거", "책", "연필"][col];
+          const object = ["가방을", "펜을", "자전거를", "책을", "연필을"][col];
+          meaning = `${["나는", "너는", "그는", "그녀는", "우리는"][row]} ${object} 가지고 있다. 이것은 ${["내", "네", "그의", "그녀의", "우리의"][row]} ${owned}이다.`;
+          break;
+        }
+        case 7:
+          meaning = `${["나는", "너는", "그는", "그녀는", "그들은"][row]} ${["연필 한 자루가 있다", "여자 형제가 두 명 있다", "새 자전거가 한 대 있다", "숙제가 조금 있다", "생각이 하나 있다"][col]}.`;
+          break;
+        case 8:
+          meaning = `${["그는", "그녀는", "톰은", "내 여자 형제는", "내 아버지는"][row]} ${["매일", "매일 아침", "방과 후에", "주말마다", "매주 일요일에"][row]} ${["축구를 한다", "책을 읽는다", "영어를 공부한다", "설거지를 한다", "체육관에 간다"][col]}.`;
+          break;
+        case 9:
+          meaning = `${["너는", "그는", "그녀는", "톰은", "그들은"][row]} ${["고양이를 좋아하니", "아침을 일찍 먹니", "테니스를 치니", "이 근처에 사니", "영어를 할 줄 아니"][col]}?`;
+          break;
+        case 10:
+          meaning = `${basicSubjects[row]} ${["고기를 먹지 않는다", "비 오는 날을 좋아하지 않는다", "농구를 하지 않는다", "커피를 마시지 않는다", "밤에 TV를 보지 않는다"][col]}.`;
+          break;
+        case 11:
+          meaning = `${basicSubjects[row]} ${["지금 책을 읽고 있다", "지금 밖에서 놀고 있다", "지금 영어를 공부하고 있다", "지금 TV를 보고 있다", "지금 점심을 먹고 있다"][col]}.`;
+          break;
+        case 12:
+          meaning = `${["나는", "너는", "그는", "우리는", "그들은"][row]} ${["어제 집에 있었다", "지난밤 매우 피곤했다", "오늘 아침 수업에 늦었다", "지난 일요일 공원에 있었다", "어제 경기 후 행복했다"][col]}.`;
+          break;
+        case 13:
+          meaning = `${["나는", "그는", "그녀는", "우리는", "그들은"][row]} 어제 ${["그림을 그렸다", "설거지를 했다", "방을 청소했다", "박물관을 방문했다", "영어를 공부했다"][col]}.`;
+          break;
+        case 14:
+          meaning = `나는 ${["어제", "지난 월요일에", "지난 토요일에", "지난여름에", "이틀 전에"][col]} ${["공원에 갔다", "사과를 먹었다", "영화를 보았다", "편지를 썼다", "책을 샀다"][row]}.`;
+          break;
+        case 15:
+          meaning = `${["나는", "너는", "그는", "그녀는", "그들은"][row]} ${["오늘 밤 공부할 것이다", "내일 박물관을 방문할 것이다", "나중에 선생님께 전화할 것이다", "다음 주에 팀을 도울 것이다", "곧 도착할 것이다"][col]}.`;
+          break;
+        case 16: {
+          const subject = ["나는", "그녀는", "그는", "그들은", "우리는"][row];
+          const skill = ["수영할", "자전거를 탈", "피아노를 칠", "프랑스어를 말할", "파스타를 요리할"][col];
+          const able = row === 0 || row === 1 || row === 4;
+          meaning = `${subject} ${skill} 줄 ${able ? "안다" : "모른다"}. ${subject} ${skill} 수 ${able ? "있다" : "없다"}.`;
+          break;
+        }
+        case 17: {
+          const required = col < 3;
+          const must = ["안전벨트를 매야 한다", "도서관에서 조용히 있어야 한다", "먹기 전에 손을 씻어야 한다"];
+          const mustNot = ["", "", "", "복도에서 뛰면 안 된다", "뜨거운 난로를 만지면 안 된다"];
+          const statement = required ? must[col] : mustNot[col];
+          const person = ["너는", "우리는", "학생들은", "그들은", "아이들은"][row];
+          meaning = `규칙: 모두 ${statement}. ${person} ${statement}.`;
+          break;
+        }
+        case 18:
+          meaning = `${["공은", "책은", "장난감은", "펜은", "열쇠는"][row]} ${["상자", "가방", "바구니", "서랍", "컵"][row]} ${["안에", "위에", "아래에", "뒤에", "옆에"][col]} 있다.`;
+          break;
+        case 19:
+          meaning = `${["우리는", "그녀는", "그는", "그들은", "수업은"][row]} ${["8시에", "월요일에", "7월에", "아침에", "금요일 밤에"][col]} ${["만난다", "공부한다", "일어난다", "축구를 한다", "시작된다"][row]}.`;
+          break;
+        case 20:
+          meaning = [
+            ["네 선생님은 누구니?", "문 앞에 있는 사람은 누구니?", "누가 내 연필을 가지고 있니?", "누가 너에게 전화하고 있니?", "누가 우리를 도울 수 있니?"],
+            ["네 이름은 무엇이니?", "상자 안에 무엇이 있니?", "너는 무엇을 먹고 싶니?", "네 가방은 무슨 색이니?", "네가 가장 좋아하는 운동은 무엇이니?"],
+            ["도서관은 어디에 있니?", "너는 어디에 사니?", "내 신발은 어디에 있니?", "톰은 어디에 가고 있니?", "펜을 어디에서 찾을 수 있니?"],
+            ["네 생일은 언제니?", "수업은 언제 시작하니?", "너는 언제 자러 가니?", "학교 소풍은 언제니?", "그녀는 언제 도착할까?"],
+            ["너는 왜 슬프니?", "그는 왜 늦었니?", "우리는 왜 물이 필요하니?", "그녀는 왜 영어를 공부하니?", "그들은 왜 웃고 있니?"]
+          ][row][col];
+          break;
+      }
+      return meaning;
+    }
+    for (const q of bank) {
+      q.translation = translateQuestion(q);
+      if (!q.translation) throw new Error(`${q.id + 1}번 문제의 한국어 뜻이 없습니다.`);
+    }
+    function render() {
+      stats();
+      view.replaceChildren();
+      if (!session) {
+        view.append(textNode("h2", "문제를 풀어 보세요"),
+          textNode("p", "위에서 전체·주제별 풀이를 시작하거나, 목록에서 문제를 체크하고 ‘선택한 문제 풀기’를 누르세요.", "muted"));
+        const begin = textNode("button", "▶ 문제 풀기", "primary");
+        begin.type = "button";
+        begin.addEventListener("click", () => start(select.value));
+        view.append(begin);
+        return;
+      }
+      if (session.index >= session.order.length) { finish(); return; }
+      const q = bank[session.order[session.index]];
+      view.append(textNode("div", `${q.id + 1}번 · ${difficultyLabel(q)} · ${q.topic} · ${session.index + 1} / ${session.order.length}`, "eyebrow"),
+        textNode("h2", q.prompt, "question"));
+      const meaning = document.createElement("div");
+      meaning.className = "translation";
+      meaning.append(textNode("strong", "한국어 뜻"), document.createTextNode(q.translation));
+      view.append(meaning);
+      const form = document.createElement("form");
+      form.className = "answer-form";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "answer-input";
+      input.placeholder = "빈칸의 영어 정답을 입력하세요";
+      input.setAttribute("aria-label", "빈칸에 들어갈 영어 정답");
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      input.required = true;
+      input.maxLength = 100;
+      input.value = session.selected ?? "";
+      input.disabled = session.selected !== null;
+      const check = textNode("button", "채점하기", "primary");
+      check.type = "submit";
+      check.disabled = session.selected !== null;
+      form.append(input, check);
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        if (session.selected !== null || !input.value.trim()) return;
+        const value = input.value.trim();
+        session.selected = value;
+        session.answered++;
+        history.answered++;
+        if (isCorrect(value, q)) {
+          session.correct++;
+          history.correct++;
+          history.wrongIds = history.wrongIds.filter(id => id !== q.id);
+        } else {
+          if (!history.wrongIds.includes(q.id)) history.wrongIds.push(q.id);
+          session.mistakes.push({ id: q.id, input: value });
+        }
+        save(); render();
+      });
+      view.append(form);
+      if (session.selected === null) {
+        view.append(textNode("p", "답을 직접 입력하고 Enter 또는 채점하기를 누르세요. 대소문자와 끝 문장부호는 채점에서 제외합니다.", "hint"));
+        input.focus();
+      } else {
+        const right = isCorrect(session.selected, q);
+        const feedback = document.createElement("div");
+        feedback.className = `feedback ${right ? "good" : "bad"}`;
+        feedback.setAttribute("role", "status");
+        feedback.append(textNode("strong", right ? "정답입니다!" : `오답입니다. 정답: ${q.answer}`, "explain-title"));
+        addExplanation(feedback, q);
+        const row = document.createElement("div");
+        row.className = "next-row";
+        const next = textNode("button", session.index === session.order.length - 1 ? "최종 점수 보기" : "다음 문제", "primary");
+        next.type = "button";
+        next.addEventListener("click", () => {
+          session.index++;
+          session.selected = null;
+          save(); render();
+        });
+        row.append(next);
+        view.append(feedback, row);
+        next.focus();
+      }
+    }
+    el("questionSearch").addEventListener("input", renderBrowser);
+    el("difficultyFilter").addEventListener("change", renderBrowser);
+    el("questionList").addEventListener("change", event => {
+      const checkbox = event.target;
+      if (!(checkbox instanceof HTMLInputElement) || checkbox.type !== "checkbox") return;
+      const id = Number(checkbox.value);
+      if (!Number.isInteger(id) || id < 0 || id >= bank.length) return;
+      if (checkbox.checked) selectedIds.add(id);
+      else selectedIds.delete(id);
+      save();
+      updateBrowserCount(visibleQuestions().length);
+    });
+    el("selectVisibleBtn").addEventListener("click", () => {
+      for (const q of visibleQuestions()) selectedIds.add(q.id);
+      save(); renderBrowser();
+    });
+    el("clearSelectedBtn").addEventListener("click", () => {
+      selectedIds.clear(); save(); renderBrowser();
+    });
+    el("startSelectedBtn").addEventListener("click", () => start("selected"));
+    el("startBtn").addEventListener("click", () => start(select.value));
+    el("reviewBtn").addEventListener("click", () => start("review"));
+    el("resetBtn").addEventListener("click", () => {
+      if (!confirm("풀이 기록과 오답 목록을 모두 삭제할까요?")) return;
+      history = { answered: 0, correct: 0, wrongIds: [] };
+      session = null;
+      save(); render();
+    });
+    renderBrowser();
+    render();
+  } catch (error) {
+    console.error("영어 문법 퀴즈 초기화 오류", error);
+    view.replaceChildren();
+    view.append(document.createTextNode("문제 초기화 중 오류가 발생했습니다. 화면을 새로고침해 주세요."));
+  }
+})();
+</script>
+<script>
+  (() => {
+    const button = document.getElementById('themeToggle');
+    if (!button) return;
+    const draw = () => {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      button.textContent = dark ? '☀️ 화이트 모드' : '🌙 블랙 모드';
+      button.setAttribute('aria-label', dark ? '화이트 모드로 전환' : '블랙 모드로 전환');
+      button.setAttribute('aria-pressed', String(dark));
+    };
+    button.addEventListener('click', () => {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+      try { localStorage.setItem('englishQuizTheme', document.documentElement.dataset.theme); } catch (_) {}
+      draw();
+    });
+    draw();
+  })();
+</script>
+</body>
+</html>
